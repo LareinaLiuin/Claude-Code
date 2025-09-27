@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>黄金矿工 - 经典游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .game-container {
+            width: 400px;
+            height: 600px;
+            background: #2c3e50;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-header {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .game-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            font-size: 14px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .game-canvas {
+            width: 100%;
+            height: 450px;
+            position: relative;
+            background: linear-gradient(to bottom, #34495e 0%, #2c3e50 100%);
+            overflow: hidden;
+        }
+
+        .miner {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 60px;
+            background: #e74c3c;
+            border-radius: 50% 50% 0 0;
+            z-index: 5;
+        }
+
+        .miner::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            width: 30px;
+            height: 30px;
+            background: #f39c12;
+            border-radius: 50%;
+        }
+
+        .miner::after {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 20px;
+            width: 20px;
+            height: 20px;
+            background: #34495e;
+            border-radius: 50%;
+        }
+
+        .hook-line {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            width: 3px;
+            background: #95a5a6;
+            transform-origin: top center;
+            z-index: 3;
+        }
+
+        .hook {
+            position: absolute;
+            bottom: -20px;
+            left: -10px;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #7f8c8d;
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .gold-item {
+            position: absolute;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .gold-small {
+            width: 25px;
+            height: 25px;
+            background: radial-gradient(circle, #f1c40f, #f39c12);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
+        }
+
+        .gold-medium {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, #f1c40f, #f39c12);
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(241, 196, 15, 0.6);
+        }
+
+        .gold-large {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #f1c40f, #f39c12);
+            border-radius: 50%;
+            box-shadow: 0 0 20px rgba(241, 196, 15, 0.7);
+        }
+
+        .diamond {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            transform: rotate(45deg);
+            box-shadow: 0 0 15px rgba(52, 152, 219, 0.8);
+        }
+
+        .rock {
+            background: #7f8c8d;
+            border-radius: 30%;
+        }
+
+        .rock-small {
+            width: 30px;
+            height: 30px;
+        }
+
+        .rock-medium {
+            width: 45px;
+            height: 45px;
+        }
+
+        .rock-large {
+            width: 60px;
+            height: 60px;
+        }
+
+        .game-controls {
+            background: #34495e;
+            padding: 15px 10px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .game-btn {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 3px;
+            min-width: 70px;
+        }
+
+        .game-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+        }
+
+        .game-btn:active {
+            transform: translateY(0);
+        }
+
+        .game-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .start-screen, .game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 20;
+        }
+
+        .start-screen h2, .game-over-screen h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #f39c12;
+        }
+
+        .start-screen p, .game-over-screen p {
+            font-size: 18px;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .score-popup {
+            position: absolute;
+            color: #f39c12;
+            font-weight: bold;
+            font-size: 18px;
+            z-index: 15;
+            pointer-events: none;
+            animation: scoreFloat 1s ease-out forwards;
+        }
+
+        @keyframes scoreFloat {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+        }
+
+        .level-complete {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(39, 174, 96, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 15;
+            display: none;
+        }
+
+        .time-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: #e74c3c;
+            z-index: 8;
+            transition: width 0.1s linear;
+        }
+
+        .mobile-controls {
+            display: none;
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        .mobile-btn {
+            width: 80px;
+            height: 80px;
+            background: rgba(52, 152, 219, 0.8);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .mobile-btn:active {
+            transform: scale(0.95);
+        }
+
+        @media (max-width: 480px) {
+            .game-container {
+                width: 100vw;
+                height: 100vh;
+                border-radius: 0;
+            }
+
+            .mobile-controls {
+                display: block;
+            }
+
+            .game-controls {
+                display: none;
+            }
+        }
+
+        .game-instructions {
+            position: absolute;
+            bottom: 75px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 11px;
+            text-align: center;
+            opacity: 0.7;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <div class="game-title">🏆 黄金矿工</div>
+            <div class="game-stats">
+                <div class="stat-item">
+                    💰 <span id="score">0</span>
+                </div>
+                <div class="stat-item">
+                    🎯 <span id="target">100</span>
+                </div>
+                <div class="stat-item">
+                    ⏱️ <span id="level">1</span>关
+                </div>
+                <div class="stat-item">
+                    ⏰ <span id="time">60</span>秒
+                </div>
+            </div>
+        </div>
+
+        <div class="game-canvas" id="gameCanvas">
+            <div class="time-bar" id="timeBar"></div>
+            <div class="miner"></div>
+            <div class="hook-line" id="hookLine">
+                <div class="hook"></div>
+            </div>
+        </div>
+
+        <div class="game-controls">
+            <button class="game-btn" id="startBtn">开始游戏</button>
+            <button class="game-btn" id="pauseBtn" disabled>暂停</button>
+            <button class="game-btn" id="resetBtn">重置</button>
+        </div>
+
+        <div class="mobile-controls">
+            <button class="mobile-btn" id="mobileBtn">⬇️</button>
+        </div>
+
+        <div class="game-instructions">
+            按空格键或点击按钮发射钩子
+        </div>
+
+        <div class="start-screen" id="startScreen">
+            <h2>🏆 黄金矿工</h2>
+            <p>
+                帮助矿工挖掘黄金和钻石！<br>
+                控制钩子抓取地下的宝藏<br>
+                达到目标分数即可过关
+            </p>
+            <button class="game-btn" id="startGameBtn">开始游戏</button>
+        </div>
+
+        <div class="game-over-screen hidden" id="gameOverScreen">
+            <h2 id="gameOverTitle">游戏结束</h2>
+            <p id="gameOverMessage">最终得分：<span id="finalScore">0</span></p>
+            <button class="game-btn" id="restartBtn">重新开始</button>
+        </div>
+
+        <div class="level-complete" id="levelComplete">
+            <h3>🎉 关卡完成！</h3>
+            <p>准备进入下一关...</p>
+        </div>
+    </div>
+
+    <script>
+        class GoldMinerGame {
+            constructor() {
+                this.gameCanvas = document.getElementById('gameCanvas');
+                this.hookLine = document.getElementById('hookLine');
+                this.startScreen = document.getElementById('startScreen');
+                this.gameOverScreen = document.getElementById('gameOverScreen');
+
+                this.gameState = 'start'; // start, playing, paused, gameOver
+                this.score = 0;
+                this.level = 1;
+                this.timeLeft = 60;
+                this.target = 100;
+
+                this.hookAngle = 0;
+                this.hookDirection = 1;
+                this.baseHookSpeed = 2;
+                this.hookLength = 50;
+                this.maxHookLength = 300;
+                this.isExtending = false;
+                this.isRetracting = false;
+                this.grabbedItem = null;
+
+                this.items = [];
+                this.gameTimer = null;
+                this.hookTimer = null;
+
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.updateDisplay();
+            }
+
+            setupEventListeners() {
+                // 开始游戏
+                document.getElementById('startGameBtn').addEventListener('click', () => this.startGame());
+                document.getElementById('startBtn').addEventListener('click', () => this.startGame());
+                document.getElementById('restartBtn').addEventListener('click', () => this.restartGame());
+
+                // 游戏控制
+                document.getElementById('pauseBtn').addEventListener('click', () => this.togglePause());
+                document.getElementById('resetBtn').addEventListener('click', () => this.restartGame());
+
+                // 键盘控制
+                document.addEventListener('keydown', (e) => {
+                    if (e.code === 'Space') {
+                        e.preventDefault();
+                        this.shootHook();
+                    }
+                });
+
+                // 移动端控制
+                document.getElementById('mobileBtn').addEventListener('click', () => this.shootHook());
+
+                // 防止双击缩放
+                this.gameCanvas.addEventListener('touchstart', (e) => {
+                    if (e.touches.length > 1) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            startGame() {
+                this.gameState = 'playing';
+                this.score = 0;
+                this.level = 1;
+                this.timeLeft = 60;
+                this.target = 100;
+
+                this.startScreen.classList.add('hidden');
+                this.gameOverScreen.classList.add('hidden');
+
+                this.generateItems();
+                this.updateDisplay();
+                this.startGameLoop();
+                this.startTimer();
+
+                // 启用按钮
+                document.getElementById('pauseBtn').disabled = false;
+            }
+
+            restartGame() {
+                this.resetGame();
+                this.startGame();
+            }
+
+            resetGame() {
+                this.gameState = 'start';
+                this.score = 0;
+                this.level = 1;
+                this.timeLeft = 60;
+                this.target = 100;
+
+                this.hookAngle = 0;
+                this.hookLength = 50;
+                this.isExtending = false;
+                this.isRetracting = false;
+                this.grabbedItem = null;
+
+                this.clearTimers();
+                this.clearItems();
+                this.resetHook();
+
+                document.getElementById('pauseBtn').disabled = true;
+                document.getElementById('pauseBtn').textContent = '暂停';
+            }
+
+            togglePause() {
+                if (this.gameState === 'playing') {
+                    this.gameState = 'paused';
+                    this.clearTimers();
+                    document.getElementById('pauseBtn').textContent = '继续';
+                } else if (this.gameState === 'paused') {
+                    this.gameState = 'playing';
+                    this.startGameLoop();
+                    this.startTimer();
+                    document.getElementById('pauseBtn').textContent = '暂停';
+                }
+            }
+
+            generateItems() {
+                this.clearItems();
+
+                const canvasRect = this.gameCanvas.getBoundingClientRect();
+                const itemTypes = [
+                    { class: 'gold-small', value: 50, weight: 1, speed: 1 },
+                    { class: 'gold-medium', value: 100, weight: 1.5, speed: 0.8 },
+                    { class: 'gold-large', value: 250, weight: 2, speed: 0.6 },
+                    { class: 'diamond', value: 500, weight: 0.8, speed: 1.2 },
+                    { class: 'rock-small', value: 20, weight: 1.2, speed: 0.5 },
+                    { class: 'rock-medium', value: 30, weight: 1.8, speed: 0.4 },
+                    { class: 'rock-large', value: 40, weight: 2.5, speed: 0.3 }
+                ];
+
+                // 根据关卡调整物品数量和价值
+                const baseCount = 8 + this.level * 2;
+
+                for (let i = 0; i < baseCount; i++) {
+                    const typeIndex = Math.floor(Math.random() * itemTypes.length);
+                    const type = itemTypes[typeIndex];
+
+                    const item = document.createElement('div');
+                    item.className = `gold-item ${type.class}`;
+                    item.dataset.value = type.value * (1 + this.level * 0.1);
+                    item.dataset.weight = type.weight;
+                    item.dataset.speed = type.speed;
+
+                    // 随机位置，避免重叠
+                    let x, y;
+                    let attempts = 0;
+                    do {
+                        x = Math.random() * (this.gameCanvas.offsetWidth - 60) + 30;
+                        y = Math.random() * (this.gameCanvas.offsetHeight - 200) + 150;
+                        attempts++;
+                    } while (this.checkOverlap(x, y, 60) && attempts < 50);
+
+                    item.style.left = x + 'px';
+                    item.style.top = y + 'px';
+
+                    this.gameCanvas.appendChild(item);
+                    this.items.push(item);
+                }
+            }
+
+            checkOverlap(x, y, minDistance) {
+                return this.items.some(item => {
+                    const itemX = parseInt(item.style.left);
+                    const itemY = parseInt(item.style.top);
+                    const distance = Math.sqrt((x - itemX) ** 2 + (y - itemY) ** 2);
+                    return distance < minDistance;
+                });
+            }
+
+            clearItems() {
+                this.items.forEach(item => {
+                    if (item.parentNode) {
+                        item.parentNode.removeChild(item);
+                    }
+                });
+                this.items = [];
+            }
+
+            startGameLoop() {
+                this.gameTimer = setInterval(() => {
+                    this.updateGame();
+                }, 20);
+            }
+
+            startTimer() {
+                const timerInterval = setInterval(() => {
+                    if (this.gameState !== 'playing') {
+                        clearInterval(timerInterval);
+                        return;
+                    }
+
+                    this.timeLeft--;
+                    this.updateDisplay();
+
+                    // 更新时间条
+                    const timeBar = document.getElementById('timeBar');
+                    const percentage = (this.timeLeft / 60) * 100;
+                    timeBar.style.width = percentage + '%';
+
+                    if (this.timeLeft <= 0) {
+                        this.endGame();
+                        clearInterval(timerInterval);
+                    }
+                }, 1000);
+            }
+
+            updateGame() {
+                if (this.gameState !== 'playing') return;
+
+                if (!this.isExtending && !this.isRetracting) {
+                    // 钩子摆动
+                    // 计算当前关卡的钩子速度（随关卡递增）
+                this.hookSpeed = this.baseHookSpeed + (this.level - 1) * 0.5;
+                this.hookAngle += this.hookDirection * this.hookSpeed;
+                    if (this.hookAngle >= 60 || this.hookAngle <= -60) {
+                        this.hookDirection *= -1;
+                    }
+                    this.updateHookPosition();
+                } else if (this.isExtending) {
+                    // 钩子延伸
+                    this.hookLength += 5;
+                    this.updateHookPosition();
+
+                    // 检查碰撞
+                    const collision = this.checkCollision();
+                    if (collision || this.hookLength >= this.maxHookLength) {
+                        this.isExtending = false;
+                        this.isRetracting = true;
+
+                        if (collision) {
+                            this.grabbedItem = collision;
+                            // 降低收回速度基于物品重量
+                            this.retractSpeed = 5 / collision.dataset.weight;
+                        } else {
+                            this.retractSpeed = 5;
+                        }
+                    }
+                } else if (this.isRetracting) {
+                    // 钩子收回
+                    this.hookLength -= this.retractSpeed;
+                    this.updateHookPosition();
+
+                    // 更新抓取的物品位置
+                    if (this.grabbedItem) {
+                        const hookEnd = this.getHookEndPosition();
+                        this.grabbedItem.style.left = (hookEnd.x - this.grabbedItem.offsetWidth / 2) + 'px';
+                        this.grabbedItem.style.top = (hookEnd.y - this.grabbedItem.offsetHeight / 2) + 'px';
+                    }
+
+                    // 收回到原位
+                    if (this.hookLength <= 50) {
+                        this.isRetracting = false;
+                        this.hookLength = 50;
+
+                        if (this.grabbedItem) {
+                            this.collectItem(this.grabbedItem);
+                            this.grabbedItem = null;
+                        }
+
+                        this.resetHook();
+                    }
+                }
+            }
+
+            shootHook() {
+                if (this.gameState !== 'playing') return;
+                if (this.isExtending || this.isRetracting) return;
+
+                this.isExtending = true;
+            }
+
+            checkCollision() {
+                const hookEnd = this.getHookEndPosition();
+
+                for (let item of this.items) {
+                    const itemRect = item.getBoundingClientRect();
+                    const canvasRect = this.gameCanvas.getBoundingClientRect();
+
+                    const itemX = itemRect.left - canvasRect.left + itemRect.width / 2;
+                    const itemY = itemRect.top - canvasRect.top + itemRect.height / 2;
+
+                    const distance = Math.sqrt((hookEnd.x - itemX) ** 2 + (hookEnd.y - itemY) ** 2);
+
+                    if (distance < 30) {
+                        return item;
+                    }
+                }
+                return null;
+            }
+
+            getHookEndPosition() {
+                const lineRect = this.hookLine.getBoundingClientRect();
+                const canvasRect = this.gameCanvas.getBoundingClientRect();
+
+                const angleRad = (this.hookAngle * Math.PI) / 180;
+                const x = lineRect.left - canvasRect.left + lineRect.width / 2 + Math.sin(angleRad) * this.hookLength;
+                const y = lineRect.top - canvasRect.top + this.hookLength;
+
+                return { x, y };
+            }
+
+            updateHookPosition() {
+                this.hookLine.style.height = this.hookLength + 'px';
+                this.hookLine.style.transform = `translateX(-50%) rotate(${this.hookAngle}deg)`;
+            }
+
+            resetHook() {
+                this.hookLength = 50;
+                this.updateHookPosition();
+            }
+
+            collectItem(item) {
+                const value = parseInt(item.dataset.value);
+                this.score += value;
+
+                // 显示得分动画
+                this.showScorePopup(item, value);
+
+                // 移除物品
+                const index = this.items.indexOf(item);
+                if (index > -1) {
+                    this.items.splice(index, 1);
+                    item.remove();
+                }
+
+                this.updateDisplay();
+
+                // 检查是否达到目标
+                if (this.score >= this.target) {
+                    this.completeLevel();
+                }
+            }
+
+            showScorePopup(item, value) {
+                const popup = document.createElement('div');
+                popup.className = 'score-popup';
+                popup.textContent = '+' + value;
+                popup.style.left = item.style.left;
+                popup.style.top = item.style.top;
+
+                this.gameCanvas.appendChild(popup);
+
+                setTimeout(() => {
+                    popup.remove();
+                }, 1000);
+            }
+
+            completeLevel() {
+                this.gameState = 'paused';
+                this.clearTimers();
+
+                const levelComplete = document.getElementById('levelComplete');
+                levelComplete.style.display = 'block';
+
+                setTimeout(() => {
+                    levelComplete.style.display = 'none';
+                    this.nextLevel();
+                }, 2000);
+            }
+
+            nextLevel() {
+                this.level++;
+                this.score = 0; // 新关卡分数清零
+                this.target = 100 + (this.level - 1) * 50;
+                this.timeLeft = Math.max(45, 60 - (this.level - 1) * 5);
+
+                this.generateItems();
+                this.resetHook();
+                this.updateDisplay();
+                this.gameState = 'playing';
+                this.startGameLoop();
+                this.startTimer();
+
+                // 重置时间条
+                document.getElementById('timeBar').style.width = '100%';
+            }
+
+            endGame() {
+                this.gameState = 'gameOver';
+                this.clearTimers();
+
+                const title = document.getElementById('gameOverTitle');
+                const message = document.getElementById('gameOverMessage');
+                const finalScore = document.getElementById('finalScore');
+
+                if (this.score >= this.target) {
+                    title.textContent = '🎉 恭喜通关！';
+                    message.innerHTML = `你成功完成了 ${this.level} 关！<br>最终得分：<span id="finalScore">${this.score}</span>`;
+                } else {
+                    title.textContent = '游戏结束';
+                    message.innerHTML = `时间到了！<br>最终得分：<span id="finalScore">${this.score}</span>`;
+                }
+
+                finalScore.textContent = this.score;
+                this.gameOverScreen.classList.remove('hidden');
+            }
+
+            updateDisplay() {
+                document.getElementById('score').textContent = this.score;
+                document.getElementById('target').textContent = this.target;
+                document.getElementById('level').textContent = this.level;
+                document.getElementById('time').textContent = this.timeLeft;
+            }
+
+            clearTimers() {
+                if (this.gameTimer) {
+                    clearInterval(this.gameTimer);
+                    this.gameTimer = null;
+                }
+            }
+        }
+
+        // 初始化游戏
+        const game = new GoldMinerGame();
+    </script>
+</body>
+</html>
