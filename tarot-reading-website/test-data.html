@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据文件测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            padding: 20px;
+        }
+        .test-result {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        .info { color: #2196F3; }
+    </style>
+</head>
+<body>
+    <h1>🧪 塔罗牌数据文件测试</h1>
+
+    <div id="test-results">
+        <div class="test-result info">正在测试数据文件...</div>
+    </div>
+
+    <script src="tarot-data.js"></script>
+    <script>
+        function runTests() {
+            const results = document.getElementById('test-results');
+            results.innerHTML = '';
+
+            // 测试1: 检查 window.tarotData 是否存在
+            const test1 = document.createElement('div');
+            test1.className = 'test-result';
+            if (window.tarotData) {
+                test1.innerHTML = '<span class="success">✅ 测试1通过:</span> window.tarotData 存在';
+                test1.className += ' success';
+            } else {
+                test1.innerHTML = '<span class="error">❌ 测试1失败:</span> window.tarotData 不存在';
+                test1.className += ' error';
+            }
+            results.appendChild(test1);
+
+            // 测试2: 检查数据结构
+            if (window.tarotData) {
+                const test2 = document.createElement('div');
+                test2.className = 'test-result';
+                const hasCards = window.tarotData.tarotCards && Array.isArray(window.tarotData.tarotCards);
+                const hasSpreads = window.tarotData.tarotSpreads && Array.isArray(window.tarotData.tarotSpreads);
+                const hasCategories = window.tarotData.questionCategories && Array.isArray(window.tarotData.questionCategories);
+
+                test2.innerHTML = `
+                    <span class="success">✅ 测试2通过:</span> 数据结构检查<br>
+                    - tarotCards: ${hasCards ? window.tarotData.tarotCards.length + ' 张' : '❌'}<br>
+                    - tarotSpreads: ${hasSpreads ? window.tarotData.tarotSpreads.length + ' 个' : '❌'}<br>
+                    - questionCategories: ${hasCategories ? window.tarotData.questionCategories.length + ' 个' : '❌'}
+                `;
+                results.appendChild(test2);
+
+                // 测试3: 显示问题分类详情
+                if (hasCategories) {
+                    const test3 = document.createElement('div');
+                    test3.className = 'test-result';
+                    test3.innerHTML = '<span class="success">✅ 测试3通过:</span> 问题分类详情<br>';
+                    window.tarotData.questionCategories.forEach(cat => {
+                        test3.innerHTML += `- ${cat.icon} ${cat.name}: ${cat.description}<br>`;
+                    });
+                    results.appendChild(test3);
+                }
+            }
+
+            console.log('🔍 详细数据:', window.tarotData);
+        }
+
+        // 等待页面和数据加载完成后运行测试
+        window.addEventListener('load', runTests);
+        setTimeout(runTests, 1000); // 备用计时器
+    </script>
+</body>
+</html>

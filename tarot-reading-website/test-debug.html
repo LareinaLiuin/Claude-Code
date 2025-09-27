@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>塔罗牌测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            padding: 20px;
+        }
+        .debug-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .spread-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid gold;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .spread-card:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <h1>塔罗牌调试页面</h1>
+
+    <div class="debug-info">
+        <h3>数据加载测试</h3>
+        <div id="data-status">正在检查数据...</div>
+    </div>
+
+    <div class="debug-info">
+        <h3>牌阵选择测试</h3>
+        <div id="spread-test">正在生成牌阵...</div>
+    </div>
+
+    <script src="tarot-data.js"></script>
+    <script>
+        function checkData() {
+            const statusDiv = document.getElementById('data-status');
+
+            // 检查 window.tarotData 是否存在
+            if (window.tarotData) {
+                statusDiv.innerHTML = `
+                    <p style="color: #4CAF50;">✅ 数据加载成功！</p>
+                    <p>塔罗牌数量: ${window.tarotData.tarotCards.length}</p>
+                    <p>牌阵数量: ${window.tarotData.tarotSpreads.length}</p>
+                    <p>问题分类: ${window.tarotData.questionCategories.length}</p>
+                `;
+
+                // 显示牌阵
+                renderSpreads();
+            } else {
+                statusDiv.innerHTML = '<p style="color: #f44336;">❌ 数据加载失败！</p>';
+            }
+        }
+
+        function renderSpreads() {
+            const container = document.getElementById('spread-test');
+            container.innerHTML = '<p>可选择的牌阵：</p>';
+
+            window.tarotData.tarotSpreads.forEach(spread => {
+                const spreadDiv = document.createElement('div');
+                spreadDiv.className = 'spread-card';
+                spreadDiv.innerHTML = `
+                    <h4>${spread.name}</h4>
+                    <p>${spread.description}</p>
+                    <small>卡牌数量: ${spread.cardCount}</small>
+                `;
+                spreadDiv.onclick = () => {
+                    alert(`你选择了: ${spread.name}`);
+                };
+                container.appendChild(spreadDiv);
+            });
+        }
+
+        // 页面加载完成后检查数据
+        window.addEventListener('load', checkData);
+    </script>
+</body>
+</html>

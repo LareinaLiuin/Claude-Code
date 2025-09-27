@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>塔罗牌调试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .debug-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .category-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid gold;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .category-card:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <h1>塔罗牌调试页面</h1>
+
+    <div class="debug-info">
+        <h3>数据加载测试</h3>
+        <div id="data-status">正在检查数据...</div>
+    </div>
+
+    <div class="debug-info">
+        <h3>问题分类测试</h3>
+        <div id="category-test">正在生成问题分类...</div>
+    </div>
+
+    <script src="tarot-data.js"></script>
+    <script>
+        function checkData() {
+            const statusDiv = document.getElementById('data-status');
+
+            // 检查 window.tarotData 是否存在
+            if (window.tarotData) {
+                statusDiv.innerHTML = `
+                    <p style="color: #4CAF50;">✅ 数据加载成功！</p>
+                    <p>塔罗牌数量: ${window.tarotData.tarotCards.length}</p>
+                    <p>牌阵数量: ${window.tarotData.tarotSpreads.length}</p>
+                    <p>问题分类: ${window.tarotData.questionCategories.length}</p>
+                `;
+
+                // 显示问题分类
+                renderCategories();
+            } else {
+                statusDiv.innerHTML = '<p style="color: #f44336;">❌ 数据加载失败！</p>';
+                setTimeout(checkData, 1000); // 1秒后重试
+            }
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('category-test');
+            container.innerHTML = '<p>可选择的领域：</p>';
+
+            if (window.tarotData && window.tarotData.questionCategories) {
+                window.tarotData.questionCategories.forEach(category => {
+                    const categoryDiv = document.createElement('div');
+                    categoryDiv.className = 'category-card';
+                    categoryDiv.innerHTML = `
+                        <h4>${category.icon} ${category.name}</h4>
+                        <p>${category.description}</p>
+                    `;
+                    categoryDiv.onclick = () => {
+                        alert(`你选择了: ${category.name}`);
+                    };
+                    container.appendChild(categoryDiv);
+                });
+            } else {
+                container.innerHTML = '<p style="color: red;">问题分类数据不可用</p>';
+            }
+        }
+
+        // 页面加载完成后检查数据
+        window.addEventListener('load', checkData);
+
+        // 也设置一个定时器检查
+        setTimeout(checkData, 2000);
+    </script>
+</body>
+</html>
