@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>项目导航中心 - Project Navigator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #48bb78;
+            --warning-color: #f6ad55;
+            --danger-color: #fc8181;
+            --dark-bg: #1a202c;
+            --light-bg: #f7fafc;
+            --card-bg: #ffffff;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        [data-theme="dark"] {
+            --light-bg: #1a202c;
+            --card-bg: #2d3748;
+            --text-primary: #f7fafc;
+            --text-secondary: #a0aec0;
+            --border-color: #4a5568;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-md);
+            backdrop-filter: blur(10px);
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 45px 12px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 25px;
+            font-size: 16px;
+            background: var(--light-bg);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            background: var(--light-bg);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .project-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .project-card.hidden {
+            display: none;
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .project-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .project-title h3 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+        }
+
+        .project-title .icon {
+            font-size: 1.5rem;
+        }
+
+        .project-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-completed {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .status-featured {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .project-description {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .project-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+
+        .tech-tag {
+            background: var(--light-bg);
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .project-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .advanced-controls {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-md);
+            display: none;
+        }
+
+        .advanced-controls.show {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            margin: 0;
+        }
+
+        .sort-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .sort-controls select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--light-bg);
+            color: var(--text-primary);
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 5px;
+        }
+
+        .view-btn {
+            padding: 6px 10px;
+            border: 1px solid var(--border-color);
+            background: var(--light-bg);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .view-btn:first-child {
+            border-radius: 6px 0 0 6px;
+        }
+
+        .view-btn:last-child {
+            border-radius: 0 6px 6px 0;
+        }
+
+        .view-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .projects-list {
+            display: none;
+        }
+
+        .projects-list.show {
+            display: block;
+        }
+
+        .project-list-item {
+            background: var(--card-bg);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .project-list-item:hover {
+            transform: translateX(5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .project-list-item.hidden {
+            display: none;
+        }
+
+        .project-list-info {
+            flex: 1;
+        }
+
+        .project-list-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+
+        .project-list-title h3 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .project-list-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .project-list-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .keyboard-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--card-bg);
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            font-size: 12px;
+            color: var(--text-secondary);
+            z-index: 100;
+        }
+
+        .keyboard-hint kbd {
+            background: var(--light-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid var(--border-color);
+            font-family: monospace;
+            margin: 0 2px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--light-bg);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .projects-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .controls {
+                padding: 20px;
+            }
+
+            .filters {
+                justify-content: center;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon" id="themeIcon"></i>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-rocket"></i> 项目导航中心</h1>
+            <p>快速浏览和管理您的所有项目</p>
+        </header>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索项目名称、描述或技术栈...">
+                <i class="fas fa-search"></i>
+            </div>
+
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">
+                    <i class="fas fa-globe"></i> 全部
+                </button>
+                <button class="filter-btn" data-filter="app">
+                    <i class="fas fa-mobile-alt"></i> 应用
+                </button>
+                <button class="filter-btn" data-filter="game">
+                    <i class="fas fa-gamepad"></i> 游戏
+                </button>
+                <button class="filter-btn" data-filter="demo">
+                    <i class="fas fa-flask"></i> 演示
+                </button>
+                <button class="filter-btn" data-filter="tool">
+                    <i class="fas fa-tools"></i> 工具
+                </button>
+                <button class="filter-btn" data-filter="react">
+                    <i class="fab fa-react"></i> React
+                </button>
+                <button class="filter-btn" data-filter="typescript">
+                    <i class="fas fa-code"></i> TypeScript
+                </button>
+            </div>
+
+            <div class="stats">
+                <span id="projectCount">共 17 个项目</span>
+                <span id="visibleCount">显示 17 个</span>
+                <button class="btn btn-secondary" onclick="toggleAdvancedControls()" style="margin-left: auto;">
+                    <i class="fas fa-cog"></i> 高级筛选
+                </button>
+            </div>
+        </div>
+
+        <div class="advanced-controls" id="advancedControls">
+            <div class="control-group">
+                <label>排序方式:</label>
+                <div class="sort-controls">
+                    <select id="sortSelect" onchange="sortProjects()">
+                        <option value="name">按名称</option>
+                        <option value="category">按分类</option>
+                        <option value="updated">按更新时间</option>
+                        <option value="tech">按技术栈</option>
+                    </select>
+                    <div class="view-toggle">
+                        <button class="view-btn active" onclick="setViewMode('grid')" title="网格视图">
+                            <i class="fas fa-th"></i>
+                        </button>
+                        <button class="view-btn" onclick="setViewMode('list')" title="列表视图">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>技术栈筛选:</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="tech-html" checked onchange="applyAdvancedFilters()">
+                        <label for="tech-html">HTML/CSS/JS</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="tech-react" checked onchange="applyAdvancedFilters()">
+                        <label for="tech-react">React</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="tech-typescript" checked onchange="applyAdvancedFilters()">
+                        <label for="tech-typescript">TypeScript</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="tech-vite" checked onchange="applyAdvancedFilters()">
+                        <label for="tech-vite">Vite</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="projects-grid" id="projectsGrid">
+            <!-- 项目卡片将通过JavaScript动态生成 -->
+        </div>
+
+        <div class="projects-list" id="projectsList">
+            <!-- 项目列表将通过JavaScript动态生成 -->
+        </div>
+
+        <div class="no-results" id="noResults" style="display: none;">
+            <i class="fas fa-search" style="font-size: 3rem; margin-bottom: 20px; opacity: 0.3;"></i>
+            <p>没有找到匹配的项目</p>
+        </div>
+    </div>
+
+    <div class="keyboard-hint" id="keyboardHint">
+        <strong>快捷键:</strong> <kbd>Ctrl</kbd>+<kbd>K</kbd> 搜索 | <kbd>Esc</kbd> 清空 | <kbd>/</kbd> 聚焦搜索
+    </div>
+
+    <script>
+        // 项目数据
+        const projects = [
+            {
+                id: 'tarot-reading-website',
+                title: '塔罗牌测算网站',
+                description: '完整的在线塔罗牌测算平台，支持多种牌阵和智能解读',
+                category: 'app',
+                tech: ['HTML', 'CSS', 'JavaScript'],
+                status: 'completed',
+                icon: 'fa-tarot',
+                color: '#667eea',
+                files: 'tarot-reading.html (2411 lines), tarot-data.js (460 lines)',
+                lastUpdated: '2025-09-27',
+                path: 'tarot-reading-website/tarot-reading.html'
+            },
+            {
+                id: 'chinese-name-generator',
+                title: '中文名字生成器',
+                description: '根据用户需求生成中文名字，结合传统文化和现代需求',
+                category: 'tool',
+                tech: ['HTML', 'CSS', 'JavaScript'],
+                status: 'completed',
+                icon: 'fa-feather',
+                color: '#f6ad55',
+                files: 'chinese-name-generator.html (569 lines)',
+                lastUpdated: '2025-09-21',
+                path: 'chinese-name-generator/chinese-name-generator.html'
+            },
+            {
+                id: 'gold-miner-game',
+                title: '黄金矿工游戏',
+                description: '经典黄金矿工游戏的网页版，完整游戏逻辑和交互体验',
+                category: 'game',
+                tech: ['HTML', 'CSS', 'JavaScript'],
+                status: 'completed',
+                icon: 'fa-hammer',
+                color: '#fc8181',
+                files: 'gold-miner-game.html (846 lines)',
+                lastUpdated: '2025-09-25',
+                path: 'gold-miner-game/gold-miner-game.html'
+            },
+            {
+                id: 'snake-game',
+                title: '贪吃蛇游戏',
+                description: '经典贪吃蛇游戏的网页版，响应式控制，流畅游戏体验',
+                category: 'game',
+                tech: ['HTML', 'CSS', 'JavaScript'],
+                status: 'completed',
+                icon: 'fa-snake',
+                color: '#48bb78',
+                files: 'snake-game.html (361 lines)',
+                lastUpdated: '2025-09-21',
+                path: 'snake-game/snake-game.html'
+            },
+            {
+                id: 'todo-app',
+                title: '待办事项应用',
+                description: '简洁高效的待办事项管理工具，支持本地存储',
+                category: 'app',
+                tech: ['HTML', 'CSS', 'JavaScript'],
+                status: 'completed',
+                icon: 'fa-tasks',
+                color: '#4299e1',
+                files: 'todo-app.html (724 lines)',
+                lastUpdated: '2025-09-21',
+                path: 'todo-app/todo-app.html'
+            },
+            {
+                id: 'responsive-layout-demo',
+                title: '响应式布局演示',
+                description: '现代CSS布局技术展示，包括Flexbox和Grid',
+                category: 'demo',
+                tech: ['HTML', 'CSS', 'JavaScript'],
+                status: 'completed',
+                icon: 'fa-mobile-alt',
+                color: '#9f7aea',
+                files: 'index.html (390 lines)',
+                lastUpdated: '2025-10-08',
+                path: 'responsive-layout-demo/index.html'
+            },
+            {
+                id: 'greeting-app',
+                title: '问候语生成器',
+                description: '个性化问候语生成工具，多种模板和优雅界面',
+                category: 'tool',
+                tech: ['HTML', 'CSS', 'JavaScript'],
+                status: 'completed',
+                icon: 'fa-comment-dots',
+                color: '#ed64a6',
+                files: 'index.html (202 lines)',
+                lastUpdated: '2025-10-09',
+                path: 'greeting-app/index.html'
+            },
+            {
+                id: 'answer-book-website',
+                title: '答案之书',
+                description: '神秘的答案之书互动应用，3D书本翻页效果和智慧答案',
+                category: 'app',
+                tech: ['HTML', 'CSS', 'JavaScript'],
+                status: 'completed',
+                icon: 'fa-book',
+                color: '#38b2ac',
+                files: 'answer-book.html (803 lines)',
+                lastUpdated: '2025-10-11',
+                path: 'answer-book-website/answer-book.html'
+            },
+            {
+                id: 'dark-mode-toggle-demo',
+                title: '夜间模式切换演示',
+                description: '夜间模式主题切换演示，平滑过渡动画和本地存储',
+                category: 'demo',
+                tech: ['HTML', 'CSS', 'JavaScript'],
+                status: 'completed',
+                icon: 'fa-moon',
+                color: '#2d3748',
+                files: 'index.html (268 lines)',
+                lastUpdated: '2025-10-13',
+                path: 'dark-mode-toggle-demo/index.html'
+            },
+            {
+                id: 'faq-list-demo',
+                title: '常见问题列表',
+                description: '可展开收起的常见问题列表演示，支持键盘和无障碍访问',
+                category: 'demo',
+                tech: ['HTML', 'CSS', 'JavaScript'],
+                status: 'completed',
+                icon: 'fa-question-circle',
+                color: '#3182ce',
+                files: 'index.html (543 lines)',
+                lastUpdated: '2025-10-13',
+                path: 'faq-list-demo/index.html'
+            },
+            {
+                id: 'cat-viewer-app',
+                title: '随机猫咪图片查看器',
+                description: '随机获取和显示猫咪图片，API集成和统计功能',
+                category: 'app',
+                tech: ['HTML', 'CSS', 'JavaScript'],
+                status: 'completed',
+                icon: 'fa-cat',
+                color: '#f56565',
+                files: 'index.html (681 lines)',
+                lastUpdated: '2025-10-13',
+                path: 'cat-viewer-app/index.html'
+            },
+            {
+                id: 'personal-card-react',
+                title: 'React个人名片',
+                description: '使用React和TailwindCSS制作的现代化个人名片',
+                category: 'demo',
+                tech: ['React', 'TailwindCSS', 'JavaScript'],
+                status: 'completed',
+                icon: 'fa-id-card',
+                color: '#00bcd4',
+                files: 'index.html (257 lines)',
+                lastUpdated: '2025-10-13',
+                path: 'personal-card-react/index.html'
+            },
+            {
+                id: 'react-counter-demo',
+                title: 'React计数器组件',
+                description: '最简单的React计数器组件演示，学习React Hooks',
+                category: 'demo',
+                tech: ['React', 'JavaScript'],
+                status: 'completed',
+                icon: 'fa-sort-numeric-up',
+                color: '#ff6b6b',
+                files: 'index.html (92 lines)',
+                lastUpdated: '2025-10-13',
+                path: 'react-counter-demo/index.html'
+            },
+            {
+                id: 'react-ts-app',
+                title: 'React+TypeScript应用',
+                description: '使用Vite创建的现代化React+TypeScript项目',
+                category: 'demo',
+                tech: ['React', 'TypeScript', 'Vite'],
+                status: 'completed',
+                icon: 'fa-code',
+                color: '#007acc',
+                files: '多文件 (复杂项目)',
+                lastUpdated: '2025-10-13',
+                path: 'react-ts-app/index.html'
+            },
+            {
+                id: 'claude-installer-script',
+                title: 'Claude安装脚本',
+                description: 'Claude Code自动安装配置脚本，一键安装开发环境',
+                category: 'tool',
+                tech: ['Shell', 'Linux'],
+                status: 'completed',
+                icon: 'fa-terminal',
+                color: '#2d3748',
+                files: 'install-claude.sh',
+                lastUpdated: '2025-10-08',
+                path: 'claude-installer-script/install-claude.sh'
+            },
+            {
+                id: 'basic-html-template',
+                title: '基础HTML模板',
+                description: '简洁的HTML基础模板，包含导航栏和响应式图片画廊',
+                category: 'demo',
+                tech: ['HTML', 'CSS'],
+                status: 'completed',
+                icon: 'fa-file-code',
+                color: '#718096',
+                files: 'index.html (90 lines)',
+                lastUpdated: '2025-10-15',
+                path: 'basic-html-template/index.html'
+            },
+            {
+                id: 'my-awesome-app',
+                title: 'My Awesome App',
+                description: '使用Vite构建的现代化React应用模板',
+                category: 'demo',
+                tech: ['React', 'TypeScript', 'Vite'],
+                status: 'completed',
+                icon: 'fa-rocket',
+                color: '#805ad5',
+                files: 'index.html (13 lines)',
+                lastUpdated: '2025-10-15',
+                path: 'my-awesome-app/index.html'
+            },
+            {
+                id: 'lareina',
+                title: '林风声个人主页',
+                description: '使用Next.js 15 + TypeScript + Tailwind CSS构建的现代化个人主页，包含个人信息、技能专长、联系方式和响应式设计',
+                category: 'app',
+                tech: ['Next.js', 'TypeScript', 'Tailwind CSS', 'React', 'Image Optimization'],
+                status: 'completed',
+                icon: 'fa-user',
+                color: '#667eea',
+                files: 'Next.js项目（复杂项目）',
+                lastUpdated: '2025-10-21',
+                path: 'lareina/'
+            }
+        ];
+
+        // 初始化
+        let currentFilter = 'all';
+        let searchTerm = '';
+        let currentSort = 'name';
+        let viewMode = 'grid';
+        let advancedFilters = {
+            tech: {
+                html: true,
+                react: true,
+                typescript: true,
+                vite: true
+            },
+            enabled: false // 新增标志：高级筛选是否启用
+        };
+
+        function init() {
+            renderProjects();
+            setupEventListeners();
+            loadTheme();
+            updateStats();
+            setupKeyboardShortcuts();
+        }
+
+        // 渲染项目
+        function renderProjects() {
+            const grid = document.getElementById('projectsGrid');
+            const list = document.getElementById('projectsList');
+            const filteredProjects = filterAndSortProjects();
+
+            if (filteredProjects.length === 0) {
+                grid.innerHTML = '';
+                list.innerHTML = '';
+                document.getElementById('noResults').style.display = 'block';
+                updateStats(0);
+                return;
+            }
+
+            document.getElementById('noResults').style.display = 'none';
+
+            // 渲染网格视图
+            grid.innerHTML = filteredProjects.map(project => `
+                <div class="project-card fade-in ${project.id === 'lareina' ? 'status-featured' : ''}" data-id="${project.id}" data-category="${project.category}" data-tech="${project.tech.join(',').toLowerCase()}">
+                    <div class="project-header">
+                        <div>
+                            <div class="project-title">
+                                <i class="fas ${project.icon}" style="color: ${project.color}"></i>
+                                <h3>${project.title}</h3>
+                            </div>
+                        </div>
+                        <span class="project-status ${project.id === 'lareina' ? 'status-featured' : 'status-completed'}">
+                            ${project.id === 'lareina' ? '⭐ 精选项目' : '✅ 完成'}
+                        </span>
+                    </div>
+
+                    <p class="project-description">${project.description}</p>
+
+                    <div class="project-tech">
+                        ${project.tech.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
+                    </div>
+
+                    <div class="project-meta">
+                        <span><i class="fas fa-file-code"></i> ${project.files}</span>
+                        <span><i class="fas fa-calendar"></i> ${project.lastUpdated}</span>
+                    </div>
+
+                    <div class="project-actions">
+                        <button class="btn btn-primary" onclick="openProject('${project.path}')">
+                            <i class="fas fa-external-link-alt"></i> 打开项目
+                        </button>
+                        <button class="btn btn-secondary" onclick="showProjectDetails('${project.id}')">
+                            <i class="fas fa-info-circle"></i> 详情
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // 渲染列表视图
+            list.innerHTML = filteredProjects.map(project => `
+                <div class="project-list-item fade-in" data-id="${project.id}" data-category="${project.category}" data-tech="${project.tech.join(',').toLowerCase()}">
+                    <div class="project-list-info">
+                        <div class="project-list-title">
+                            <i class="fas ${project.icon}" style="color: ${project.color}"></i>
+                            <h3>${project.title}</h3>
+                        </div>
+                        <p class="project-list-description">${project.description}</p>
+                        <div class="project-list-meta">
+                            <span><i class="fas fa-folder"></i> ${getCategoryName(project.category)}</span>
+                            <span><i class="fas fa-code"></i> ${project.tech.join(', ')}</span>
+                            <span><i class="fas fa-calendar"></i> ${project.lastUpdated}</span>
+                        </div>
+                    </div>
+                    <div class="project-actions">
+                        <button class="btn btn-primary" onclick="openProject('${project.path}')">
+                            <i class="fas fa-external-link-alt"></i> 打开
+                        </button>
+                        <button class="btn btn-secondary" onclick="showProjectDetails('${project.id}')">
+                            <i class="fas fa-info-circle"></i> 详情
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            updateStats(filteredProjects.length);
+        }
+
+        // 过滤和排序项目
+        function filterAndSortProjects() {
+            let filteredProjects = filterProjects();
+            return sortProjectsArray(filteredProjects, currentSort);
+        }
+
+        // 过滤项目
+        function filterProjects() {
+            return projects.filter(project => {
+                // 基础分类过滤
+                const matchesFilter = currentFilter === 'all' ||
+                                    project.category === currentFilter ||
+                                    project.tech.some(tech => tech.toLowerCase() === currentFilter);
+
+                // 搜索过滤
+                const matchesSearch = searchTerm === '' ||
+                                    project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                    project.tech.some(tech => tech.toLowerCase().includes(searchTerm.toLowerCase()));
+
+                // 高级技术栈过滤 - 只有在启用时才生效
+                let matchesTech = true;
+
+                if (advancedFilters.enabled) {
+                    const hasAnyTechSelected = Object.values(advancedFilters.tech).some(selected => selected);
+
+                    if (hasAnyTechSelected) {
+                        // 如果有选中的技术，项目必须包含至少一个选中的技术
+                        matchesTech = Object.keys(advancedFilters.tech).some(tech => {
+                            if (!advancedFilters.tech[tech]) return false; // 跳过未选中的技术
+                            return project.tech.some(projectTech => {
+                                const projectTechLower = projectTech.toLowerCase();
+                                const filterTechLower = tech.toLowerCase();
+
+                                // 改进匹配逻辑
+                                if (filterTechLower === 'html') {
+                                    return projectTechLower.includes('html') ||
+                                           projectTechLower.includes('css') ||
+                                           projectTechLower === 'javascript';
+                                }
+                                return projectTechLower.includes(filterTechLower);
+                            });
+                        });
+                    }
+                }
+
+                return matchesFilter && matchesSearch && matchesTech;
+            });
+        }
+
+        // 排序项目数组
+        function sortProjectsArray(projectArray, sortBy) {
+            const sorted = [...projectArray];
+
+            switch (sortBy) {
+                case 'name':
+                    return sorted.sort((a, b) => a.title.localeCompare(b.title, 'zh-CN'));
+                case 'category':
+                    return sorted.sort((a, b) => a.category.localeCompare(b.category));
+                case 'updated':
+                    return sorted.sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated));
+                case 'tech':
+                    return sorted.sort((a, b) => a.tech[0].localeCompare(b.tech[0]));
+                default:
+                    return sorted;
+            }
+        }
+
+        // 获取分类名称
+        function getCategoryName(category) {
+            const names = {
+                'app': '应用',
+                'game': '游戏',
+                'demo': '演示',
+                'tool': '工具'
+            };
+            return names[category] || category;
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            // 搜索功能
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                searchTerm = e.target.value;
+                renderProjects();
+            });
+
+            // 过滤按钮
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilter = btn.dataset.filter;
+                    renderProjects();
+                });
+            });
+        }
+
+        // 设置键盘快捷键
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                // Ctrl+K 或 Cmd+K 聚焦搜索
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    document.getElementById('searchInput').focus();
+                }
+
+                // Esc 清空搜索
+                if (e.key === 'Escape') {
+                    document.getElementById('searchInput').value = '';
+                    searchTerm = '';
+                    renderProjects();
+                }
+
+                // / 聚焦搜索
+                if (e.key === '/' && document.activeElement !== document.getElementById('searchInput')) {
+                    e.preventDefault();
+                    document.getElementById('searchInput').focus();
+                }
+            });
+        }
+
+        // 切换高级控制面板
+        function toggleAdvancedControls() {
+            const controls = document.getElementById('advancedControls');
+            controls.classList.toggle('show');
+        }
+
+        // 排序项目
+        function sortProjects() {
+            const sortSelect = document.getElementById('sortSelect');
+            currentSort = sortSelect.value;
+            renderProjects();
+        }
+
+        // 设置视图模式
+        function setViewMode(mode) {
+            viewMode = mode;
+            const grid = document.getElementById('projectsGrid');
+            const list = document.getElementById('projectsList');
+            const viewBtns = document.querySelectorAll('.view-btn');
+
+            viewBtns.forEach(btn => btn.classList.remove('active'));
+
+            if (mode === 'grid') {
+                grid.style.display = 'grid';
+                list.style.display = 'none';
+                viewBtns[0].classList.add('active');
+            } else {
+                grid.style.display = 'none';
+                list.style.display = 'block';
+                viewBtns[1].classList.add('active');
+            }
+        }
+
+        // 应用高级筛选
+        function applyAdvancedFilters() {
+            // 启用高级筛选
+            advancedFilters.enabled = true;
+
+            // 更新技术栈筛选状态
+            advancedFilters.tech.html = document.getElementById('tech-html').checked;
+            advancedFilters.tech.react = document.getElementById('tech-react').checked;
+            advancedFilters.tech.typescript = document.getElementById('tech-typescript').checked;
+            advancedFilters.tech.vite = document.getElementById('tech-vite').checked;
+
+            console.log('高级筛选已启用:', advancedFilters);
+            renderProjects();
+        }
+
+        // 打开项目
+        function openProject(path) {
+            // 在浏览器中打开项目
+            window.open(path, '_blank');
+        }
+
+        // 显示项目详情
+        function showProjectDetails(projectId) {
+            const project = projects.find(p => p.id === projectId);
+            if (project) {
+                alert(`项目详情：\n\n名称：${project.title}\n描述：${project.description}\n技术栈：${project.tech.join(', ')}\n最后更新：${project.lastUpdated}\n\n项目文件：${project.files}`);
+            }
+        }
+
+        // 更新统计信息
+        function updateStats(visibleCount) {
+            document.getElementById('projectCount').textContent = `共 ${projects.length} 个项目`;
+            document.getElementById('visibleCount').textContent = `显示 ${visibleCount || projects.length} 个`;
+        }
+
+        // 主题切换
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('themeIcon');
+
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.removeAttribute('data-theme');
+                themeIcon.className = 'fas fa-moon';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // 加载主题
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const themeIcon = document.getElementById('themeIcon');
+
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-sun';
+            }
+        }
+
+        // 启动应用
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
