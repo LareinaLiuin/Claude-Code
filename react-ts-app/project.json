@@ -1,0 +1,73 @@
+{
+  "id": "react-ts-app",
+  "name": "React+TypeScript应用",
+  "description": "使用Vite创建的现代化React+TypeScript项目",
+  "category": "demo",
+  "subcategory": "learning",
+  "techStack": ["React", "TypeScript", "Vite", "ESLint"],
+  "framework": "React 19",
+  "status": "completed",
+  "version": "1.0.0",
+  "author": "Developer",
+  "created": "2025-10-13",
+  "lastUpdated": "2025-10-13",
+  "mainFile": "src/App.tsx",
+  "files": [
+    {
+      "name": "src/App.tsx",
+      "description": "主应用组件",
+      "lines": 903,
+      "type": "typescript"
+    },
+    {
+      "name": "src/main.tsx",
+      "description": "应用入口文件",
+      "lines": 230,
+      "type": "typescript"
+    },
+    {
+      "name": "package.json",
+      "description": "项目配置和依赖",
+      "lines": 713,
+      "type": "json"
+    },
+    {
+      "name": "tsconfig.json",
+      "description": "TypeScript配置",
+      "lines": 119,
+      "type": "json"
+    },
+    {
+      "name": "vite.config.ts",
+      "description": "Vite构建配置",
+      "lines": 161,
+      "type": "typescript"
+    }
+  ],
+  "features": [
+    "Vite构建工具",
+    "TypeScript类型安全",
+    "ESLint代码规范",
+    "现代化开发体验",
+    "React 19",
+    "模块化开发"
+  ],
+  "tags": ["React", "TypeScript", "Vite", "现代化", "学习"],
+  "demoUrl": "",
+  "repositoryUrl": "",
+  "screenshots": [],
+  "dependencies": [
+    "react",
+    "react-dom",
+    "typescript",
+    "vite",
+    "@typescript-eslint/eslint-plugin",
+    "@typescript-eslint/parser",
+    "eslint"
+  ],
+  "browsers": ["Chrome", "Firefox", "Safari", "Edge"],
+  "mobile": true,
+  "offline": false,
+  "complexity": "high",
+  "rating": 5
+}

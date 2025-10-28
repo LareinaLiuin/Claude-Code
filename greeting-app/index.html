@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>问候语生成器</title>
+    <style>
+        /* 重置默认样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .greeting-display {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .greeting-text {
+            font-size: 1.2rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            input[type="text"] {
+                padding: 12px;
+            }
+
+            button {
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>问候语生成器</h1>
+
+        <div class="input-group">
+            <label for="nameInput">请输入您的名字：</label>
+            <input type="text" id="nameInput" placeholder="在这里输入名字">
+        </div>
+
+        <button id="generateBtn">生成问候语</button>
+
+        <div class="greeting-display" id="greetingDisplay">
+            <div class="placeholder">点击按钮生成问候语</div>
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const nameInput = document.getElementById('nameInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const greetingDisplay = document.getElementById('greetingDisplay');
+
+        // 获取时间段问候语函数
+        function getTimeGreeting() {
+            const now = new Date();
+            const hour = now.getHours();
+
+            if (hour >= 5 && hour < 12) {
+                return '早上好';
+            } else if (hour >= 12 && hour < 18) {
+                return '下午好';
+            } else {
+                return '晚上好';
+            }
+        }
+
+        // 生成问候语函数
+        function generateGreeting() {
+            const name = nameInput.value.trim();
+
+            if (name === '') {
+                greetingDisplay.innerHTML = '<div class="placeholder">请先输入您的名字</div>';
+                return;
+            }
+
+            // 获取时间段问候语
+            const timeGreeting = getTimeGreeting();
+
+            // 生成指定的问候语
+            const greeting = `${timeGreeting}，${name}！欢迎来到我的魔法世界！`;
+
+            // 显示问候语
+            greetingDisplay.innerHTML = `<div class="greeting-text">${greeting}</div>`;
+        }
+
+        // 事件监听器
+        generateBtn.addEventListener('click', generateGreeting);
+
+        // 支持按回车键生成问候语
+        nameInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                generateGreeting();
+            }
+        });
+
+        // 页面加载时自动聚焦到输入框
+        window.addEventListener('load', function() {
+            nameInput.focus();
+        });
+    </script>
+</body>
+</html>

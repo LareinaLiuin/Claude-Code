@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机猫咪图片查看器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-gradient-start: #667eea;
+            --bg-gradient-end: #764ba2;
+            --card-bg: #ffffff;
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --button-bg: #5b21b6;
+            --button-hover: #6b46c1;
+            --button-text: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --border-radius: 20px;
+            --transition-speed: 0.3s;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            color: var(--text-primary);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: 0 25px 50px -12px var(--shadow);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .cat-image-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background-color: #f7fafc;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+            transition: all var(--transition-speed) ease;
+        }
+
+        .cat-image-container.loading {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .cat-image {
+            opacity: 0;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .cat-image.loaded {
+            opacity: 1;
+        }
+
+        .placeholder {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+        }
+
+        .placeholder-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .placeholder-text {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .placeholder-subtext {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--button-bg);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .cat-image-container.loading .loading-spinner {
+            display: block;
+        }
+
+        .cat-image-container.loading .placeholder {
+            display: none;
+        }
+
+        .cat-image-container:not(.loading) .cat-image {
+            display: block;
+        }
+
+        /* 确保图片在容器中完美居中 */
+        .cat-image-container {
+            position: relative;
+        }
+
+        .cat-image-container img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            max-width: calc(100% - 2rem);
+            max-height: calc(100% - 2rem);
+            object-fit: contain;
+        }
+
+        .cat-image-container img.loaded {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .summon-button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--button-bg), var(--button-hover));
+            color: var(--button-text);
+            border: none;
+            padding: 1.25rem 2rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            box-shadow: 0 10px 25px -5px rgba(91, 33, 182, 0.25);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .summon-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px -5px rgba(91, 33, 182, 0.35);
+        }
+
+        .summon-button:active {
+            transform: translateY(0);
+        }
+
+        .summon-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .summon-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .summon-button:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .button-icon {
+            font-size: 1.3rem;
+        }
+
+        .stats {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(91, 33, 182, 0.05) 0%, rgba(107, 70, 193, 0.05) 100%);
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--button-bg);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .error-message {
+            background-color: #fed7d7;
+            color: #c53030;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #e53e3e;
+            display: none;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background-color: #c6f6d5;
+            color: #22543d;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #38a169;
+            display: none;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header {
+                padding: 2rem 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .content {
+                padding: 1.5rem;
+            }
+
+            .cat-image-container {
+                height: 300px;
+            }
+
+            .summon-button {
+                font-size: 1.1rem;
+                padding: 1rem 1.5rem;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .stat-item {
+                flex: none;
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                text-align: left;
+            }
+
+            .stat-label::after {
+                content: ':';
+            }
+        }
+
+        /* 无障碍访问支持 */
+        .summon-button:focus {
+            outline: 3px solid rgba(91, 33, 182, 0.5);
+            outline-offset: 2px;
+        }
+
+        /* 页面加载动画 */
+        .container {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease-out 0.2s forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🐱 随机猫咪查看器</h1>
+            <p>点击按钮召唤一只可爱的猫咪！</p>
+        </header>
+
+        <div class="content">
+            <div class="error-message" id="errorMessage">
+                哎呀，获取猫咪图片失败了！请再试一次。
+            </div>
+
+            <div class="success-message" id="successMessage">
+                猫咪已成功召唤！🎉
+            </div>
+
+            <div class="cat-image-container" id="catImageContainer">
+                <div class="placeholder">
+                    <div class="placeholder-icon">🐱</div>
+                    <div class="placeholder-text">还没有猫咪</div>
+                    <div class="placeholder-subtext">点击下方按钮召唤一只</div>
+                </div>
+                <div class="loading-spinner"></div>
+                <img id="catImage" class="cat-image" alt="随机猫咪图片" />
+            </div>
+
+            <button class="summon-button" id="summonButton">
+                <span class="button-icon">✨</span>
+                <span id="buttonText">召唤一只猫咪！</span>
+            </button>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-value" id="totalCount">0</span>
+                    <span class="stat-label">总计召唤</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="todayCount">0</span>
+                    <span class="stat-label">今日召唤</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" id="uniqueCount">0</span>
+                    <span class="stat-label">不同猫咪</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const summonButton = document.getElementById('summonButton');
+        const buttonText = document.getElementById('buttonText');
+        const catImage = document.getElementById('catImage');
+        const catImageContainer = document.getElementById('catImageContainer');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const totalCount = document.getElementById('totalCount');
+        const todayCount = document.getElementById('todayCount');
+        const uniqueCount = document.getElementById('uniqueCount');
+
+        // 统计数据
+        let stats = {
+            total: 0,
+            today: 0,
+            unique: new Set(),
+            lastDate: new Date().toDateString()
+        };
+
+        // 加载统计数据
+        function loadStats() {
+            const savedStats = localStorage.getItem('catViewerStats');
+            if (savedStats) {
+                const parsed = JSON.parse(savedStats);
+                stats.total = parsed.total || 0;
+                stats.unique = new Set(parsed.unique || []);
+                stats.lastDate = parsed.lastDate || new Date().toDateString();
+
+                // 检查是否是新的一天
+                const today = new Date().toDateString();
+                if (stats.lastDate !== today) {
+                    stats.today = 0;
+                    stats.lastDate = today;
+                } else {
+                    stats.today = parsed.today || 0;
+                }
+            }
+            updateStatsDisplay();
+        }
+
+        // 保存统计数据
+        function saveStats() {
+            localStorage.setItem('catViewerStats', JSON.stringify({
+                total: stats.total,
+                today: stats.today,
+                unique: Array.from(stats.unique),
+                lastDate: stats.lastDate
+            }));
+        }
+
+        // 更新统计显示
+        function updateStatsDisplay() {
+            totalCount.textContent = stats.total;
+            todayCount.textContent = stats.today;
+            uniqueCount.textContent = stats.unique.size;
+        }
+
+        // 显示错误消息
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+            }, 5000);
+        }
+
+        // 显示成功消息
+        function showSuccess() {
+            successMessage.classList.add('show');
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+            }, 2000);
+        }
+
+        // 获取随机猫咪图片
+        function fetchCatImage() {
+            return fetch('https://api.thecatapi.com/v1/images/search')
+                .then(response => {
+                    // 检查响应状态
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // 检查返回的数据
+                    if (data && data.length > 0 && data[0].url) {
+                        return data[0].url;
+                    } else {
+                        throw new Error('No cat image found in response');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching cat image:', error);
+
+                    // 备用API
+                    return fetch('https://cataas.com/cat?json=true')
+                        .then(backupResponse => {
+                            if (backupResponse.ok) {
+                                return backupResponse.json();
+                            }
+                            throw new Error('Backup API failed');
+                        })
+                        .then(backupData => {
+                            if (backupData && backupData.url) {
+                                return `https://cataas.com${backupData.url}`;
+                            }
+                            throw new Error('No image in backup response');
+                        })
+                        .catch(backupError => {
+                            console.error('Backup API also failed:', backupError);
+                            throw error; // 抛出原始错误
+                        });
+                });
+        }
+
+        // 加载猫咪图片
+        function loadCatImage() {
+            // 设置加载状态
+            catImageContainer.classList.add('loading');
+            catImage.classList.remove('loaded');
+            summonButton.disabled = true;
+            buttonText.textContent = '正在召唤...';
+
+            // 使用fetchCatImage函数获取图片URL
+            fetchCatImage()
+                .then(imageUrl => {
+                    // 预加载图片
+                    const img = new Image();
+
+                    img.onload = function() {
+                        // 图片加载完成
+                        catImage.src = imageUrl;
+                        catImage.classList.add('loaded');
+                        catImageContainer.classList.remove('loading');
+                        summonButton.disabled = false;
+                        buttonText.textContent = '召唤一只猫咪！';
+
+                        // 更新统计
+                        stats.total++;
+                        stats.today++;
+                        stats.unique.add(imageUrl);
+                        saveStats();
+                        updateStatsDisplay();
+
+                        // 显示成功消息
+                        showSuccess();
+                    };
+
+                    img.onerror = function() {
+                        // 图片加载失败
+                        catImageContainer.classList.remove('loading');
+                        summonButton.disabled = false;
+                        buttonText.textContent = '召唤一只猫咪！';
+                        showError('猫咪图片加载失败，请重试！');
+                    };
+
+                    // 开始加载图片
+                    img.src = imageUrl;
+                })
+                .catch(error => {
+                    // API调用失败
+                    console.error('Error in loadCatImage:', error);
+                    catImageContainer.classList.remove('loading');
+                    summonButton.disabled = false;
+                    buttonText.textContent = '召唤一只猫咪！';
+                    showError('获取猫咪图片失败，请检查网络连接后重试！');
+                });
+        }
+
+        // 添加点击效果
+        function addButtonEffect() {
+            summonButton.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                summonButton.style.transform = 'scale(1)';
+            }, 150);
+        }
+
+        // 事件监听器
+        summonButton.addEventListener('click', () => {
+            addButtonEffect();
+            loadCatImage();
+        });
+
+        // 键盘支持
+        summonButton.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                addButtonEffect();
+                loadCatImage();
+            }
+        });
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+
+            // 自动加载第一只猫咪
+            setTimeout(() => {
+                loadCatImage();
+            }, 1000);
+        });
+
+        // 添加图片点击下载功能
+        catImage.addEventListener('click', function() {
+            if (this.src && this.classList.contains('loaded')) {
+                const link = document.createElement('a');
+                link.href = this.src;
+                link.download = `cat-${Date.now()}.jpg`;
+                link.target = '_blank';
+                link.click();
+            }
+        });
+
+        // 添加图片悬停提示
+        catImage.addEventListener('mouseenter', function() {
+            if (this.src && this.classList.contains('loaded')) {
+                this.style.cursor = 'pointer';
+                this.title = '点击下载图片';
+            }
+        });
+
+        catImage.addEventListener('mouseleave', function() {
+            this.style.cursor = 'default';
+            this.title = '';
+        });
+    </script>
+</body>
+</html>

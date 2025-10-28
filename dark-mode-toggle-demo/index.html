@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>夜间模式切换演示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --button-bg: #4a90e2;
+            --button-text: #ffffff;
+            --button-hover: #357abd;
+            --card-bg: #f8f9fa;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #e0e0e0;
+            --button-bg: #5ca3f5;
+            --button-text: #ffffff;
+            --button-hover: #4a90e2;
+            --card-bg: #2d2d2d;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .demo-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 3rem;
+            box-shadow: 0 8px 32px var(--shadow);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+
+        .toggle-button {
+            background: linear-gradient(135deg, var(--button-bg), var(--button-hover));
+            color: var(--button-text);
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px var(--shadow);
+            position: relative;
+            overflow: hidden;
+            font-weight: 600;
+        }
+
+        .toggle-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow);
+        }
+
+        .toggle-button:active {
+            transform: translateY(0);
+        }
+
+        .toggle-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .toggle-button:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .icon {
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+
+  
+        .current-mode {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .demo-card {
+                padding: 2rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="demo-card">
+            <h1>🌓 夜间模式演示</h1>
+            <p class="subtitle">点击下方按钮切换明暗主题</p>
+
+            <button class="toggle-button" id="themeToggle">
+                <span class="icon" id="buttonIcon">🌙</span>
+                <span id="buttonText">切换模式</span>
+            </button>
+
+            <div class="current-mode" id="currentMode">
+                当前模式：亮色主题
+            </div>
+        </div>
+
+      </div>
+
+    <script>
+        // 获取DOM元素
+        const themeToggle = document.getElementById('themeToggle');
+        const buttonIcon = document.getElementById('buttonIcon');
+        const buttonText = document.getElementById('buttonText');
+        const currentMode = document.getElementById('currentMode');
+        const html = document.documentElement;
+
+        // 检查本地存储中的主题设置
+        const savedTheme = localStorage.getItem('theme');
+
+        // 检查系统主题偏好
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        // 设置初始主题
+        function initializeTheme() {
+            if (savedTheme) {
+                html.setAttribute('data-theme', savedTheme);
+                updateButton(savedTheme);
+            } else if (systemPrefersDark) {
+                html.setAttribute('data-theme', 'dark');
+                updateButton('dark');
+            } else {
+                html.setAttribute('data-theme', 'light');
+                updateButton('light');
+            }
+        }
+
+        // 更新按钮状态
+        function updateButton(theme) {
+            if (theme === 'dark') {
+                buttonIcon.textContent = '☀️';
+                buttonText.textContent = '切换到亮色模式';
+                currentMode.textContent = '当前模式：暗色主题';
+            } else {
+                buttonIcon.textContent = '🌙';
+                buttonText.textContent = '切换到暗色模式';
+                currentMode.textContent = '当前模式：亮色主题';
+            }
+        }
+
+        // 切换主题
+        function toggleTheme() {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            // 添加点击动画效果
+            themeToggle.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                themeToggle.style.transform = 'scale(1)';
+            }, 200);
+
+            // 设置新主题
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateButton(newTheme);
+
+            // 触发自定义事件
+            window.dispatchEvent(new CustomEvent('themechange', {
+                detail: { theme: newTheme }
+            }));
+        }
+
+        // 监听系统主题变化
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                const newTheme = e.matches ? 'dark' : 'light';
+                html.setAttribute('data-theme', newTheme);
+                updateButton(newTheme);
+            }
+        });
+
+        // 事件监听器
+        themeToggle.addEventListener('click', toggleTheme);
+
+        // 键盘支持 (空格键和回车键)
+        themeToggle.addEventListener('keydown', (e) => {
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                toggleTheme();
+            }
+        });
+
+        // 初始化主题
+        initializeTheme();
+
+        // 页面加载完成后的动画
+        window.addEventListener('load', () => {
+            document.querySelector('.demo-card').style.opacity = '0';
+            document.querySelector('.demo-card').style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                document.querySelector('.demo-card').style.transition = 'all 0.6s ease';
+                document.querySelector('.demo-card').style.opacity = '1';
+                document.querySelector('.demo-card').style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body>
+</html>

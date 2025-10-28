@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>答案之书 - 神秘的指引</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #B8D4E3 0%, #D6E4F0 25%, #E8F2F8 50%, #D6E4F0 75%, #B8D4E3 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* 星空背景效果 */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        /* 主容器 - Flexbox完美居中 */
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            width: 100%;
+            max-width: 1000px;
+            z-index: 10;
+            gap: 60px;
+        }
+
+        /* 书本容器 */
+        .book-container {
+            perspective: 1500px;
+            width: 400px;
+            height: 300px;
+            position: relative;
+        }
+
+        /* 书本主体 */
+        .book {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        /* 封面 */
+        .book-cover {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #A8C8EC 0%, #C6DCF0 50%, #A8C8EC 100%);
+            border-radius: 15px;
+            box-shadow:
+                0 15px 40px rgba(0,0,0,0.4),
+                inset 0 0 30px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transform-origin: center;
+            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+            border: none;
+            z-index: 10;
+        }
+
+        .book-cover.hidden {
+            transform: rotateY(180deg);
+            opacity: 0;
+        }
+
+        /* 封面装饰 */
+        .cover-title {
+            font-size: 42px;
+            font-weight: bold;
+            color: #FFFFFF;
+            text-shadow:
+                3px 3px 6px rgba(0,0,0,0.8),
+                0 0 30px rgba(255,215,0,0.6);
+            margin-bottom: 25px;
+            text-align: center;
+            letter-spacing: 5px;
+            font-family: 'STKaiti', 'KaiTi', serif;
+        }
+
+        .cover-decoration {
+            width: 70%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #FFFFFF, transparent);
+            margin: 15px 0;
+        }
+
+        .cover-symbol {
+            font-size: 50px;
+            color: #FFFFFF;
+            opacity: 0.9;
+            margin-top: 25px;
+            text-shadow: 0 0 15px rgba(255,255,255,0.5);
+            animation: symbol-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes symbol-glow {
+            0%, 100% { opacity: 0.9; }
+            50% { opacity: 0.6; }
+        }
+
+        /* 书页容器 */
+        .book-pages-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+            pointer-events: none;
+        }
+
+        .book-pages-container.visible {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: auto;
+        }
+
+        /* 左页 */
+        .left-page {
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(135deg, #F5DEB3 0%, #FAEBD7 50%, #F5DEB3 100%);
+            border-radius: 15px 0 0 15px;
+            box-shadow:
+                -8px 0 25px rgba(0,0,0,0.15),
+                inset 0 0 40px rgba(139,69,19,0.08);
+            position: relative;
+            border: 2px solid #B0C4DE;
+            border-right: 1px solid #B0C4DE;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* 右页 */
+        .right-page {
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(135deg, #FAEBD7 0%, #F5DEB3 50%, #FAEBD7 100%);
+            border-radius: 0 15px 15px 0;
+            box-shadow:
+                8px 0 25px rgba(0,0,0,0.15),
+                inset 0 0 40px rgba(139,69,19,0.08);
+            position: relative;
+            border: 2px solid #B0C4DE;
+            border-left: 1px solid #B0C4DE;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* 页面装饰线条 */
+        .page-line {
+            position: absolute;
+            width: 2px;
+            height: 80%;
+            background: linear-gradient(180deg, transparent, #4682B4 20%, #4682B4 80%, transparent);
+            opacity: 0.2;
+        }
+
+        .left-page .page-line {
+            left: 25px;
+        }
+
+        .right-page .page-line {
+            right: 25px;
+        }
+
+        /* 页面装饰符号 */
+        .page-decoration {
+            position: absolute;
+            font-size: 18px;
+            color: #4682B4;
+            opacity: 0.25;
+        }
+
+        .decoration-top-left {
+            top: 25px;
+            left: 25px;
+        }
+
+        .decoration-top-right {
+            top: 25px;
+            right: 25px;
+        }
+
+        .decoration-bottom-left {
+            bottom: 25px;
+            left: 25px;
+        }
+
+        .decoration-bottom-right {
+            bottom: 25px;
+            right: 25px;
+        }
+
+        /* 答案区域 - 跨越两个页面 */
+        .answer-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 50px 40px;
+            z-index: 5;
+        }
+
+        /* 答案文本 */
+        .answer-text {
+            font-size: 32px;
+            line-height: 1.6;
+            color: #2C1810;
+            font-family: 'STSong', 'SimSun', serif;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(15px) scale(0.95);
+            transition: all 1s ease-in-out;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .answer-text.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* 加载状态 */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: #4682B4;
+            opacity: 0;
+            transition: opacity 0.6s;
+            font-family: 'STKaiti', 'KaiTi', serif;
+            letter-spacing: 2px;
+        }
+
+        .loading.show {
+            opacity: 1;
+        }
+
+        /* 按钮样式 */
+        .ask-button {
+            padding: 22px 55px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #FFA500 0%, #FFD700 50%, #FFA500 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow:
+                0 12px 35px rgba(255,165,0,0.4),
+                0 6px 25px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            min-width: 280px;
+        }
+
+        .ask-button:hover {
+            transform: translateY(-3px);
+            box-shadow:
+                0 18px 45px rgba(255,165,0,0.5),
+                0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .ask-button:active {
+            transform: translateY(-1px);
+        }
+
+        .ask-button:disabled {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.2);
+        }
+
+        /* 按钮波纹效果 */
+        .ask-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .ask-button.pulse::before {
+            width: 400px;
+            height: 400px;
+            opacity: 0;
+        }
+
+        /* 魔法粒子效果 */
+        .magic-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: #FFD700;
+            border-radius: 50%;
+            opacity: 0;
+            animation: float-up 2.5s ease-out forwards;
+        }
+
+        @keyframes float-up {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-60px) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-120px) scale(0.3);
+            }
+        }
+
+        /* 神秘光环效果 */
+        .mystical-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 180%;
+            height: 180%;
+            background: radial-gradient(circle, rgba(255,215,0,0.12) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            pointer-events: none;
+            border-radius: 50%;
+        }
+
+        .mystical-glow.active {
+            opacity: 1;
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.15);
+            }
+        }
+
+        /* 书本浮动效果 */
+        .floating {
+            animation: float 5s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .book-container {
+                width: 350px;
+                height: 260px;
+            }
+
+            .cover-title {
+                font-size: 36px;
+                letter-spacing: 4px;
+            }
+
+            .answer-text {
+                font-size: 28px;
+                padding: 40px 30px;
+            }
+
+            .ask-button {
+                padding: 20px 45px;
+                font-size: 22px;
+                min-width: 250px;
+            }
+
+            .main-container {
+                gap: 50px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .book-container {
+                width: 300px;
+                height: 220px;
+            }
+
+            .cover-title {
+                font-size: 30px;
+                letter-spacing: 3px;
+            }
+
+            .answer-text {
+                font-size: 24px;
+                line-height: 1.5;
+                padding: 35px 25px;
+            }
+
+            .ask-button {
+                padding: 18px 40px;
+                font-size: 20px;
+                min-width: 220px;
+            }
+
+            .cover-symbol {
+                font-size: 40px;
+            }
+
+            .main-container {
+                gap: 40px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .book-container {
+                width: 260px;
+                height: 190px;
+            }
+
+            .cover-title {
+                font-size: 26px;
+                letter-spacing: 2px;
+            }
+
+            .answer-text {
+                font-size: 20px;
+                padding: 30px 20px;
+            }
+
+            .ask-button {
+                padding: 15px 35px;
+                font-size: 18px;
+                min-width: 200px;
+            }
+
+            .main-container {
+                gap: 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 星空背景 -->
+    <div class="stars" id="stars"></div>
+
+    <!-- 魔法粒子 -->
+    <div class="magic-particles" id="particles"></div>
+
+    <!-- 主容器 -->
+    <div class="main-container">
+        <!-- 书本容器 -->
+        <div class="book-container floating">
+            <div class="book" id="book">
+                <!-- 封面 -->
+                <div class="book-cover" id="bookCover">
+                    <div class="cover-title">答案之书</div>
+                    <div class="cover-decoration"></div>
+                    <div class="cover-symbol">✦</div>
+                    <div class="cover-decoration"></div>
+                </div>
+
+                <!-- 书页容器 -->
+                <div class="book-pages-container" id="bookPagesContainer">
+                    <!-- 左页 -->
+                    <div class="left-page">
+                        <div class="page-line"></div>
+                        <div class="page-decoration decoration-top-left">✧</div>
+                        <div class="page-decoration decoration-bottom-left">✦</div>
+                    </div>
+
+                    <!-- 右页 -->
+                    <div class="right-page">
+                        <div class="page-line"></div>
+                        <div class="page-decoration decoration-top-right">✦</div>
+                        <div class="page-decoration decoration-bottom-right">✧</div>
+                    </div>
+
+                    <!-- 答案区域 -->
+                    <div class="answer-area">
+                        <div class="answer-text" id="answerText"></div>
+                        <div class="loading" id="loading">正在探寻答案...</div>
+                    </div>
+                </div>
+
+                <!-- 神秘光环 -->
+                <div class="mystical-glow" id="mysticalGlow"></div>
+            </div>
+        </div>
+
+        <!-- 按钮 -->
+        <button class="ask-button" id="askButton" onclick="toggleBook()">
+            答案之书的回答是
+        </button>
+    </div>
+
+    <script>
+        // 答案数据库
+        const answers = [
+            // 积极正面的答案
+            "是的，机会就在眼前，抓住它。",
+            "绝对可行，坚持下去。",
+            "星象显示一切都很顺利。",
+            "命运站在你这边。",
+            "这是一个绝佳的机会。",
+            "你的直觉是对的。",
+            "现在是最佳时机。",
+            "答案比你想象的更简单。",
+            "相信自己的选择。",
+            "好运即将降临。",
+
+            // 建议性的答案
+            "仔细思考后再决定。",
+            "需要更多的耐心。",
+            "倾听内心的声音。",
+            "寻求朋友的建议会很有帮助。",
+            "现在是学习的好时机。",
+            "放下过去，向前看。",
+            "改变会让你成长。",
+            "保持冷静，理智分析。",
+
+            // 挑战和提醒
+            "这需要更大的勇气。",
+            "准备好迎接挑战了吗？",
+            "前路不会一帆风顺。",
+            "需要付出额外的努力。",
+            "仔细评估风险。",
+            "不要被表象迷惑。",
+            "时间会证明一切。",
+
+            // 神秘深刻的答案
+            "命运的齿轮已经开始转动。",
+            "宇宙在回应你的呼唤。",
+            "古老的智慧指引着你。",
+            "星辰预示着变化。",
+            "月圆之夜将有答案。",
+            "风中传来古老的密语。",
+            "梦境中藏着线索。",
+            "直觉比逻辑更可靠。",
+
+            // 哲学性答案
+            "答案就在问题之中。",
+            "有时候没有答案也是一种答案。",
+            "过程比结果更重要。",
+            "改变视角，答案自现。",
+            "时间是最好的见证者。",
+            "万物皆有时节。",
+            "内在的力量将指引你。",
+
+            // 中性答案
+            "有可能，但需要时间。",
+            "结果尚不确定。",
+            "看情况而定。",
+            "保持观察。",
+            "等待更好的时机。",
+            "事情会有转机的。",
+
+            // 趣味性答案
+            "答案在下一杯咖啡里。",
+            "睡一觉就有答案了。",
+            "问问你的猫，它知道一切。",
+            "答案藏在彩虹的另一端。",
+            "月圆之夜再来问一次。"
+        ];
+
+        // 书本状态管理
+        const BookState = {
+            CLOSED: 'closed',
+            OPENING: 'opening',
+            OPEN: 'open',
+            CLOSING: 'closing'
+        };
+
+        let currentState = BookState.CLOSED;
+
+        // 初始化星空背景
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const starCount = 120;
+
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // 创建魔法粒子效果
+        function createMagicParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+
+            for (let i = 0; i < particleCount; i++) {
+                setTimeout(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.top = Math.random() * 100 + '%';
+                    particlesContainer.appendChild(particle);
+
+                    // 动画结束后移除粒子
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 2500);
+                }, i * 60);
+            }
+        }
+
+        // 获取随机答案
+        function getRandomAnswer() {
+            return answers[Math.floor(Math.random() * answers.length)];
+        }
+
+        // 主要的书本切换函数
+        async function toggleBook() {
+            const bookCover = document.getElementById('bookCover');
+            const bookPagesContainer = document.getElementById('bookPagesContainer');
+            const answerText = document.getElementById('answerText');
+            const loading = document.getElementById('loading');
+            const askButton = document.getElementById('askButton');
+            const mysticalGlow = document.getElementById('mysticalGlow');
+
+            // 防止重复操作
+            if (currentState === BookState.OPENING || currentState === BookState.CLOSING) {
+                return;
+            }
+
+            if (currentState === BookState.CLOSED) {
+                // 打开书本
+                currentState = BookState.OPENING;
+                askButton.disabled = true;
+                askButton.classList.add('pulse');
+
+                // 创建魔法粒子效果
+                createMagicParticles();
+
+                // 激活神秘光环
+                mysticalGlow.classList.add('active');
+
+                // 隐藏封面
+                setTimeout(() => {
+                    bookCover.classList.add('hidden');
+                }, 200);
+
+                // 显示书页
+                setTimeout(() => {
+                    bookPagesContainer.classList.add('visible');
+                    loading.classList.add('show');
+                }, 800);
+
+                // 模拟思考时间
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // 显示答案
+                const answer = getRandomAnswer();
+                loading.classList.remove('show');
+                answerText.textContent = answer;
+                answerText.classList.add('show');
+
+                // 更新状态和按钮
+                currentState = BookState.OPEN;
+                setTimeout(() => {
+                    askButton.disabled = false;
+                    askButton.classList.remove('pulse');
+                    askButton.textContent = '关闭书本';
+                }, 1000);
+
+                // 关闭神秘光环
+                setTimeout(() => {
+                    mysticalGlow.classList.remove('active');
+                }, 2000);
+
+            } else if (currentState === BookState.OPEN) {
+                // 关闭书本
+                currentState = BookState.CLOSING;
+                askButton.disabled = true;
+                askButton.classList.add('pulse');
+
+                // 隐藏答案
+                answerText.classList.remove('show');
+                loading.classList.remove('show');
+
+                // 隐藏书页
+                setTimeout(() => {
+                    bookPagesContainer.classList.remove('visible');
+                }, 500);
+
+                // 显示封面
+                setTimeout(() => {
+                    bookCover.classList.remove('hidden');
+                }, 1200);
+
+                // 更新状态和按钮
+                currentState = BookState.CLOSED;
+                setTimeout(() => {
+                    askButton.disabled = false;
+                    askButton.classList.remove('pulse');
+                    askButton.textContent = '答案之书的回答是';
+                }, 1800);
+            }
+        }
+
+        // 键盘事件支持
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const askButton = document.getElementById('askButton');
+                if (!askButton.disabled) {
+                    toggleBook();
+                }
+            }
+        });
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+        });
+    </script>
+</body>
+</html>

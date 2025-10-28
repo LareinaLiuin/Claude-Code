@@ -1,0 +1,51 @@
+{
+  "id": "tarot-reading-website",
+  "name": "塔罗牌测算网站",
+  "description": "完整的在线塔罗牌测算平台，支持多种牌阵和智能解读",
+  "category": "app",
+  "subcategory": "fortune-telling",
+  "techStack": ["HTML", "CSS", "JavaScript"],
+  "framework": "Vanilla JS",
+  "status": "completed",
+  "version": "1.0.0",
+  "author": "Developer",
+  "created": "2025-09-27",
+  "lastUpdated": "2025-09-27",
+  "mainFile": "tarot-reading.html",
+  "files": [
+    {
+      "name": "tarot-reading.html",
+      "description": "主网页应用",
+      "lines": 2411,
+      "type": "html"
+    },
+    {
+      "name": "tarot-data.js",
+      "description": "塔罗牌数据和牌阵配置",
+      "lines": 460,
+      "type": "javascript"
+    },
+    {
+      "name": "tarot-prd.md",
+      "description": "产品需求文档",
+      "type": "markdown"
+    }
+  ],
+  "features": [
+    "78张完整塔罗牌",
+    "5种牌阵配置",
+    "智能解读引擎",
+    "美观的用户界面",
+    "响应式设计"
+  ],
+  "tags": ["塔罗牌", "占卜", "测算", "神秘", "娱乐"],
+  "demoUrl": "",
+  "repositoryUrl": "",
+  "screenshots": [],
+  "dependencies": [],
+  "browsers": ["Chrome", "Firefox", "Safari", "Edge"],
+  "mobile": true,
+  "offline": true,
+  "complexity": "high",
+  "rating": 5
+}

@@ -1,0 +1,40 @@
+{
+  "id": "answer-book-website",
+  "name": "答案之书",
+  "description": "神秘的答案之书互动应用，3D书本翻页效果和智慧答案",
+  "category": "app",
+  "subcategory": "entertainment",
+  "techStack": ["HTML", "CSS", "JavaScript"],
+  "framework": "Vanilla JS",
+  "status": "completed",
+  "version": "1.0.0",
+  "author": "Developer",
+  "created": "2025-10-11",
+  "lastUpdated": "2025-10-11",
+  "mainFile": "answer-book.html",
+  "files": [
+    {
+      "name": "answer-book.html",
+      "description": "主网页应用",
+      "lines": 650,
+      "type": "html"
+    }
+  ],
+  "features": [
+    "3D书本翻页效果",
+    "神秘视觉效果",
+    "50+种智慧答案",
+    "CSS3动画",
+    "响应式设计"
+  ],
+  "tags": ["答案之书", "占卜", "智慧", "神秘", "娱乐"],
+  "demoUrl": "",
+  "repositoryUrl": "",
+  "screenshots": [],
+  "dependencies": [],
+  "browsers": ["Chrome", "Firefox", "Safari", "Edge"],
+  "mobile": true,
+  "offline": true,
+  "complexity": "medium",
+  "rating": 4
+}

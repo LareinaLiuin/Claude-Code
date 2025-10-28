@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>常见问题列表</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #f5f7fa;
+            --text-color: #2c3e50;
+            --card-bg: #ffffff;
+            --primary-color: #3498db;
+            --primary-hover: #2980b9;
+            --border-color: #e1e8ed;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --success-color: #27ae60;
+            --icon-color: #7f8c8d;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px var(--shadow);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2.5rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        .faq-container {
+            padding: 2rem;
+        }
+
+        .faq-item {
+            margin-bottom: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background-color: var(--card-bg);
+        }
+
+        .faq-item:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .faq-item.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.25);
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--card-bg);
+            transition: all 0.3s ease;
+            user-select: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .faq-question:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        .faq-question .question-text {
+            flex: 1;
+            padding-right: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .faq-question .question-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .faq-question .toggle-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            font-size: 1.2rem;
+        }
+
+        .faq-item.active .toggle-icon {
+            background-color: var(--success-color);
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            background-color: rgba(52, 152, 219, 0.03);
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+
+        .answer-content {
+            padding: 0 1.5rem 1.5rem 1.5rem;
+            line-height: 1.7;
+            color: var(--text-color);
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease 0.1s;
+        }
+
+        .faq-item.active .answer-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .answer-content p {
+            margin-bottom: 0.75rem;
+        }
+
+        .answer-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .answer-content ul {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .answer-content li {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, rgba(52, 152, 219, 0.2) 0%, rgba(52, 152, 219, 0.2) 100%);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+
+        .stats {
+            padding: 1.5rem 2rem;
+            background-color: rgba(52, 152, 219, 0.05);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--icon-color);
+            font-size: 0.9rem;
+        }
+
+        .expand-all-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .expand-all-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .header {
+                padding: 2rem 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .faq-container {
+                padding: 1.5rem;
+            }
+
+            .faq-question {
+                padding: 1.25rem;
+                font-size: 1rem;
+            }
+
+            .stats {
+                padding: 1.25rem 1.5rem;
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .stat-item {
+                justify-content: center;
+            }
+        }
+
+        /* 无障碍访问支持 */
+        .faq-question:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* 加载动画 */
+        .faq-item {
+            animation: fadeInUp 0.5s ease-out backwards;
+        }
+
+        .faq-item:nth-child(1) { animation-delay: 0.1s; }
+        .faq-item:nth-child(2) { animation-delay: 0.2s; }
+        .faq-item:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>❓ 常见问题</h1>
+            <p>点击问题查看详细答案</p>
+        </header>
+
+        <div class="faq-container">
+            <div class="faq-item" id="faq1">
+                <div class="faq-question" tabindex="0" role="button" aria-expanded="false" aria-controls="answer1">
+                    <div class="question-text">
+                        <span class="question-number">1</span>
+                        <span>什么是响应式网页设计？</span>
+                    </div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="faq-answer" id="answer1">
+                    <div class="answer-content">
+                        <p>
+                            <span class="highlight">响应式网页设计</span>是一种网页设计方法，使网站能够在不同的设备和屏幕尺寸上提供最佳的浏览体验。
+                        </p>
+                        <p>
+                            主要特点包括：
+                        </p>
+                        <ul>
+                            <li><strong>弹性布局</strong>：使用相对单位（如百分比、em、rem）而非固定像素</li>
+                            <li><strong>媒体查询</strong>：根据设备特性应用不同的CSS样式</li>
+                            <li><strong>弹性图片</strong>：图片能够自动调整大小以适应不同屏幕</li>
+                            <li><strong>移动优先</strong>：先为移动设备设计，再扩展到桌面端</li>
+                        </ul>
+                        <p>
+                            这种设计方式确保用户无论使用手机、平板还是桌面电脑，都能获得良好的用户体验。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" id="faq2">
+                <div class="faq-question" tabindex="0" role="button" aria-expanded="false" aria-controls="answer2">
+                    <div class="question-text">
+                        <span class="question-number">2</span>
+                        <span>HTML5和HTML4有什么主要区别？</span>
+                    </div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="faq-answer" id="answer2">
+                    <div class="answer-content">
+                        <p>
+                            <span class="highlight">HTML5</span>是HTML的最新版本，相比HTML4有许多重要的改进和新特性：
+                        </p>
+                        <ul>
+                            <li><strong>语义化标签</strong>：新增了header、nav、main、article、section、aside、footer等标签</li>
+                            <li><strong>多媒体支持</strong>：原生支持audio和video标签，无需插件</li>
+                            <li><strong>Canvas绘图</strong>：提供2D绘图API</li>
+                            <li><strong>本地存储</strong>：localStorage和sessionStorage</li>
+                            <li><strong>表单增强</strong：新的input类型如email、date、number等</li>
+                            <li><strong>更好的文档声明</strong>：简化的DOCTYPE声明</li>
+                        </ul>
+                        <p>
+                            HTML5使网页更加语义化、功能更强大，同时保持了对旧版本的向后兼容性。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" id="faq3">
+                <div class="faq-question" tabindex="0" role="button" aria-expanded="false" aria-controls="answer3">
+                    <div class="question-text">
+                        <span class="question-number">3</span>
+                        <span>CSS中的Flexbox布局是什么？</span>
+                    </div>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="faq-answer" id="answer3">
+                    <div class="answer-content">
+                        <p>
+                            <span class="highlight">Flexbox</span>（弹性盒子布局）是CSS3中的一种强大的一维布局方法，能够轻松实现灵活的页面布局。
+                        </p>
+                        <p>
+                            核心概念：
+                        </p>
+                        <ul>
+                            <li><strong>主轴和交叉轴</strong>：Flexbox有两个方向，主轴（main axis）和交叉轴（cross axis）</li>
+                            <li><strong>flex容器</strong>：设置了display: flex的元素成为容器</li>
+                            <li><strong>flex项目</strong>：容器的直接子元素成为flex项目</li>
+                        </ul>
+                        <p>
+                            常用属性：
+                        </p>
+                        <ul>
+                            <li><strong>容器属性</strong>：justify-content、align-items、flex-direction、flex-wrap等</li>
+                            <li><strong>项目属性</strong>：flex-grow、flex-shrink、flex-basis、align-self等</li>
+                        </ul>
+                        <p>
+                            Flexbox特别适合用于居中元素、等高列、导航栏等布局场景，比传统的浮动和定位更加灵活和强大。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <span>📊</span>
+                <span>共 <span id="totalQuestions">3</span> 个问题</span>
+            </div>
+            <div class="stat-item">
+                <span>👁️</span>
+                <span>已查看 <span id="viewedCount">0</span> 个答案</span>
+            </div>
+            <button class="expand-all-btn" id="expandAllBtn">
+                展开全部
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const faqItems = document.querySelectorAll('.faq-item');
+        const expandAllBtn = document.getElementById('expandAllBtn');
+        const totalQuestions = document.getElementById('totalQuestions');
+        const viewedCount = document.getElementById('viewedCount');
+        let allExpanded = false;
+        let viewedAnswers = new Set();
+
+        // 初始化
+        totalQuestions.textContent = faqItems.length;
+
+        // 切换单个FAQ项
+        function toggleFAQ(faqItem) {
+            const isActive = faqItem.classList.contains('active');
+            const questionElement = faqItem.querySelector('.faq-question');
+            const answerId = questionElement.getAttribute('aria-controls');
+
+            if (isActive) {
+                faqItem.classList.remove('active');
+                questionElement.setAttribute('aria-expanded', 'false');
+                viewedAnswers.delete(answerId);
+            } else {
+                faqItem.classList.add('active');
+                questionElement.setAttribute('aria-expanded', 'true');
+                viewedAnswers.add(answerId);
+            }
+
+            updateViewedCount();
+            updateExpandAllButton();
+        }
+
+        // 更新已查看计数
+        function updateViewedCount() {
+            viewedCount.textContent = viewedAnswers.size;
+        }
+
+        // 更新展开全部按钮状态
+        function updateExpandAllButton() {
+            const activeCount = document.querySelectorAll('.faq-item.active').length;
+
+            if (activeCount === faqItems.length) {
+                expandAllBtn.textContent = '收起全部';
+                allExpanded = true;
+            } else {
+                expandAllBtn.textContent = '展开全部';
+                allExpanded = false;
+            }
+        }
+
+        // 为每个FAQ项添加事件监听器
+        faqItems.forEach(faqItem => {
+            const questionElement = faqItem.querySelector('.faq-question');
+
+            // 鼠标点击事件
+            questionElement.addEventListener('click', () => {
+                toggleFAQ(faqItem);
+            });
+
+            // 键盘事件（Enter和Space）
+            questionElement.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleFAQ(faqItem);
+                }
+            });
+        });
+
+        // 展开/收起全部功能
+        expandAllBtn.addEventListener('click', () => {
+            if (allExpanded) {
+                // 收起全部
+                faqItems.forEach(faqItem => {
+                    faqItem.classList.remove('active');
+                    const questionElement = faqItem.querySelector('.faq-question');
+                    questionElement.setAttribute('aria-expanded', 'false');
+                });
+                viewedAnswers.clear();
+            } else {
+                // 展开全部
+                faqItems.forEach(faqItem => {
+                    faqItem.classList.add('active');
+                    const questionElement = faqItem.querySelector('.faq-question');
+                    const answerId = questionElement.getAttribute('aria-controls');
+                    questionElement.setAttribute('aria-expanded', 'true');
+                    viewedAnswers.add(answerId);
+                });
+            }
+
+            updateViewedCount();
+            updateExpandAllButton();
+        });
+
+        // 页面加载动画
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '0';
+            document.body.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                document.body.style.transition = 'all 0.6s ease';
+                document.body.style.opacity = '1';
+                document.body.style.transform = 'translateY(0)';
+            }, 100);
+        });
+
+        // 添加滚动视差效果（可选）
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallax = document.querySelector('.header');
+            if (parallax) {
+                parallax.style.transform = `translateY(${scrolled * 0.5}px)`;
+            }
+        });
+    </script>
+</body>
+</html>
